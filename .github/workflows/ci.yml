@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint, types, tests (PostgreSQL 17) and build
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wealthpilot_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d wealthpilot_test"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      # Migrations run as the schema owner; the API under test connects as the
+      # restricted role that row-level security applies to.
+      TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/wealthpilot_test
+      TEST_DATABASE_URL: postgresql://wealthpilot_app:wealthpilot_app@localhost:5432/wealthpilot_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build -w @wealthpilot/shared
+      - name: Lint (ESLint strict type-checked + Prettier)
+        run: npm run lint
+      - name: Type-check
+        run: npm run typecheck
+      - name: Tests with coverage thresholds
+        run: npm test
+      - name: Production build
+        run: npm run build
