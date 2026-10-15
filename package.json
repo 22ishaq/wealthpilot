@@ -1,0 +1,35 @@
+{
+  "name": "wealthpilot",
+  "private": true,
+  "type": "module",
+  "description": "Multi-tenant wealth management platform: Express/TypeScript API over PostgreSQL with row-level security, React front end.",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "typecheck": "tsc -b packages/shared && npm run typecheck --workspaces",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write . && eslint --fix .",
+    "test": "npm run test --workspaces",
+    "dev:api": "npm run dev -w @wealthpilot/api",
+    "dev:web": "npm run dev -w @wealthpilot/web",
+    "db:migrate": "npm run migrate -w @wealthpilot/api",
+    "db:seed": "npm run seed -w @wealthpilot/api"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.2"
+  }
+}
