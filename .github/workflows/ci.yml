@@ -48,3 +48,15 @@ jobs:
         run: npm test
       - name: Production build
         run: npm run build
+
+  docker:
+    name: Docker images + Compose smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose up --build --detach
+      - run: ./scripts/smoke.sh
+      - if: failure()
+        run: docker compose logs
+      - if: always()
+        run: docker compose down --volumes

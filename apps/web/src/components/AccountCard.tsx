@@ -106,7 +106,7 @@ function HoldingRow({
       </td>
       <td className="num">
         {canWrite ? (
-          <span className="row" style={{ justifyContent: "flex-end" }}>
+          <span className="row" style={{ justifyContent: "flex-end", flexWrap: "nowrap" }}>
             <button
               className="small"
               type="button"
